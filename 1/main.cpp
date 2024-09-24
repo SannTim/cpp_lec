@@ -2,30 +2,37 @@
 #include <iostream>
 
 template <int N>
-constexpr int Det(const std::array<std::array<int, N>, N>& matrix) {
-    // Базовый случай для матрицы 1x1
-    if constexpr (N == 1) {
-        return matrix[0][0];
-    } else {
-        int determinant = 0;
-        for (int col = 0; col < N; ++col) {
-            std::array<std::array<int, N - 1>, N - 1> submatrix = {};
-            
-            for (int i = 1; i < N; ++i) {
-                int sub_col = 0;
-                for (int j = 0; j < N; ++j) {
-                    if (j == col) continue;
-                    submatrix[i - 1][sub_col] = matrix[i][j];
-                    ++sub_col;
-                }
-            }
-            int sign = (col % 2 == 0) ? 1 : -1;
-            determinant += sign * matrix[0][col] * Det<N - 1>(submatrix);
+constexpr int Det(const std::array<std::array<int, N>, N>& matrix, int colMask, int size) {
+    if (size == 1) {
+        int col = 0;
+        while (!(colMask & (1 << col))) {
+            ++col;
+        }
+        return matrix[N - size][col];
+    }
+
+    int determinant = 0;
+    int row = N - size;
+    int good_col = 0;
+    for (int col = 0; col < N; ++col) {
+        if (good_col == size) break;
+        if (colMask & (1 << col)) { 
+            good_col++;
+            int sign = (good_col % 2 == 0) ? 1 : -1;
+            determinant += sign * matrix[row][col] * Det<N>(matrix, colMask ^ (1 << col), size - 1);
         }
 
-        return determinant;
     }
+
+    return determinant;
 }
+
+template <int N>
+constexpr int Det(const std::array<std::array<int, N>, N>& matrix) {
+    int fullMask = (1 << N) - 1;
+    return Det<N>(matrix, fullMask, N);
+}
+
 
 int main() {
     constexpr std::array<std::array<int, 3>, 3> matrix = {{
