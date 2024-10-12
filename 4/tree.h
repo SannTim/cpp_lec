@@ -98,8 +98,8 @@ public:
         return std::make_shared<TNode>(value);
     }
 
-public: // made it public for first time testing
-    T Value;
+private:  
+	T Value;
     TNodePtr Left = nullptr;
     TNodePtr Right = nullptr;
     std::weak_ptr<TNode<T>> Parent;
@@ -115,6 +115,10 @@ public: // made it public for first time testing
             node->Parent = parent;  
 		}
     }
+	friend class std::shared_ptr<TNode<T>>;
+
+
 };
+
 
 } // namespace NBinTree
