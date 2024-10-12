@@ -47,14 +47,13 @@ public:
     }
 
     TNodePtr GetParent() {
-        return Parent.lock(); // Convert weak_ptr to shared_ptr
+        return Parent.lock();
     }
 
     TNodeConstPtr GetParent() const {
-        return Parent.lock(); // Convert weak_ptr to shared_ptr
-    }
+        return Parent.lock(); 
+	}
 
-    // Fork now accepts raw pointers
     static TNodePtr Fork(T value, TNode* left, TNode* right) {
         TNodePtr leftPtr = (left) ? left->shared_from_this() : nullptr;
         TNodePtr rightPtr = (right) ? right->shared_from_this() : nullptr;
@@ -67,14 +66,14 @@ public:
 
     TNodePtr ReplaceLeft(TNodePtr left) {
         SetParent(left, this->shared_from_this());
-        SetParent(Left, nullptr);  // Unset previous Left's parent
+        SetParent(Left, nullptr);  
         std::swap(left, Left);
         return left;
     }
 
     TNodePtr ReplaceRight(TNodePtr right) {
         SetParent(right, this->shared_from_this());
-        SetParent(Right, nullptr);  // Unset previous Right's parent
+        SetParent(Right, nullptr);  
         std::swap(right, Right);
         return right;
     }
@@ -99,11 +98,11 @@ public:
         return std::make_shared<TNode>(value);
     }
 
-private:
+public: // made it public for first time testing
     T Value;
     TNodePtr Left = nullptr;
     TNodePtr Right = nullptr;
-    std::weak_ptr<TNode<T>> Parent;  // Use weak_ptr to avoid cycles
+    std::weak_ptr<TNode<T>> Parent;
 
     TNode(T value)
         : Value(value) {}
@@ -113,8 +112,8 @@ private:
 
     static void SetParent(TNodePtr node, TNodePtr parent) {
         if (node) {
-            node->Parent = parent;  // Set the weak pointer to avoid circular references
-        }
+            node->Parent = parent;  
+		}
     }
 };
 
