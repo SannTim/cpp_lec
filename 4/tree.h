@@ -47,18 +47,20 @@ public:
     }
 
     TNodePtr GetParent() {
-        return Parent.lock();
+        return Parent.lock(); // Convert weak_ptr to shared_ptr
     }
 
     TNodeConstPtr GetParent() const {
-        return Parent.lock(); 
-	}
+        return Parent.lock(); // Convert weak_ptr to shared_ptr
+    }
 
+    // Fork now accepts raw pointers instead of shared_ptr
     static TNodePtr Fork(T value, TNode* left, TNode* right) {
+        // Use shared_from_this() to convert raw pointers to shared_ptr
         TNodePtr leftPtr = (left) ? left->shared_from_this() : nullptr;
         TNodePtr rightPtr = (right) ? right->shared_from_this() : nullptr;
 
-        TNodePtr ptr = std::make_shared<TNode>(value, leftPtr, rightPtr);
+        TNodePtr ptr = TNodePtr(new TNode(value, leftPtr, rightPtr));
         SetParent(ptr->GetLeft(), ptr);
         SetParent(ptr->GetRight(), ptr);
         return ptr;
@@ -66,14 +68,14 @@ public:
 
     TNodePtr ReplaceLeft(TNodePtr left) {
         SetParent(left, this->shared_from_this());
-        SetParent(Left, nullptr);  
+        SetParent(Left, nullptr);  // Unset previous Left's parent
         std::swap(left, Left);
         return left;
     }
 
     TNodePtr ReplaceRight(TNodePtr right) {
         SetParent(right, this->shared_from_this());
-        SetParent(Right, nullptr);  
+        SetParent(Right, nullptr);  // Unset previous Right's parent
         std::swap(right, Right);
         return right;
     }
@@ -95,15 +97,16 @@ public:
     }
 
     static TNodePtr CreateLeaf(T value) {
-        return std::make_shared<TNode>(value);
+        return TNodePtr(new TNode(value));
     }
 
-private:  
-	T Value;
+private:
+    T Value;
     TNodePtr Left = nullptr;
     TNodePtr Right = nullptr;
-    std::weak_ptr<TNode<T>> Parent;
+    std::weak_ptr<TNode<T>> Parent;  // Use weak_ptr to avoid cycles
 
+    // Make constructors private so only factory methods can call them
     TNode(T value)
         : Value(value) {}
 
@@ -112,13 +115,9 @@ private:
 
     static void SetParent(TNodePtr node, TNodePtr parent) {
         if (node) {
-            node->Parent = parent;  
-		}
+            node->Parent = parent;  // Set the weak pointer to avoid circular references
+        }
     }
-	friend class std::shared_ptr<TNode<T>>;
-
-
 };
-
 
 } // namespace NBinTree
