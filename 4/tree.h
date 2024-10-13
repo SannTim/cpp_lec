@@ -59,8 +59,8 @@ public:
     }
 
     static TNodePtr Fork(T value, TNode* left, TNode* right) {
-        TNodePtr leftPtr = (left) ? left->shared_from_this() : nullptr;
-        TNodePtr rightPtr = (right) ? right->shared_from_this() : nullptr;
+        TNodePtr leftPtr = left ? left->shared_from_this() : nullptr;
+        TNodePtr rightPtr = right ? right->shared_from_this() : nullptr;
 
         TNodePtr ptr = TNodePtr(new TNode(value, leftPtr, rightPtr));
         SetParent(ptr->GetLeft(), ptr);
