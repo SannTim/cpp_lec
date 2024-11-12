@@ -8,7 +8,8 @@ public:
     template<typename T>
 	// make_unique, чтобы за памятью не следить XD
     Any(const T& value) : content(std::make_unique<Holder<T>>(value)) {}
-
+	
+	// скрываем этот тип T
     template<typename T>
     T get() const {
         if (typeid(T) != content->type()) {
