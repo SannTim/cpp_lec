@@ -12,6 +12,10 @@ public:
 	// скрываем этот тип T
     template<typename T>
     T get() const {
+		if (!content) {
+			throw std::runtime_error("Any is empty");
+		}
+
         if (typeid(T) != content->type()) {
             throw std::bad_cast();
         }
