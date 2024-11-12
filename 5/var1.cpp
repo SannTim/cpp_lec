@@ -6,7 +6,7 @@ class Any {
 public:
     Any() : content(nullptr) {}
     template<typename T>
-	// make_unique, чтобы за памятью не следить
+	// make_unique, чтобы за памятью не следить XD
     Any(const T& value) : content(std::make_unique<Holder<T>>(value)) {}
 
     template<typename T>
@@ -37,6 +37,8 @@ private:
 
 
 int main(){
+	// Те тип мы изначально не  знаем
+	// Работает только при указании верного типа
 	Any a(5);
 	std::cout << a.get<int>() << std::endl; // 5
 	try{
